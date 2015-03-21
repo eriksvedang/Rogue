@@ -7,6 +7,7 @@ var px = Int(w / 2)
 var py = Int(h / 2)
 var hp = 10
 
+array enemies = []
 var levelRoughness = 5
 
 array level
@@ -76,15 +77,27 @@ bool MaybeFight(number x, number y)
     return false
   end
 
-  var row = level[y]
-  var tile = row[x]
-  if tile == "X"
-    return Fight(x, y, 1)
+  var e = GetEnemyAt(x, y)
+  if e["type"] == "X"
+    return Fight(x, y, e)
   end
   return false
 end
 
-bool Fight(number x, number y, number enemyLevel)  
+array GetEnemyAt(number x, number y)
+  array noEnemy = []
+  noEnemy["type"] = "none"
+  
+  loop e in enemies
+    if e["x"] == x and e["y"] == y
+      return e
+    end
+  end
+
+  return noEnemy
+end
+
+bool Fight(number x, number y, array enemy)  
   loop a from 1 to 10
     Color(a / 10.0,1 - a / 10.0,0)
     Text(1, 0, "Attack!")
@@ -92,8 +105,8 @@ bool Fight(number x, number y, number enemyLevel)
     Sleep(0.1)
   end
 
-  if Random() > 0.3
-    SetLevel(x, y, " ")
+  if Random() > 0.5
+    enemy["type"] = "."
     Color(0,1,0)
     Text(1, 1,"Enemy defeated!")
     DisplayGraphics()
@@ -120,13 +133,16 @@ void Draw()
       var tile = row[x]
       if tile == "."
         Color(0,1,0.2)
-      else if tile == "X"
-        Color(1,1,0)
       else if tile == "#"
         Color(0.3,0.3,0.3)
       end
       Text(x + margin, y + margin, row[x])
     end
+  end
+
+  loop e in enemies
+    Color(1,0.5,0)
+    Text(margin + e["x"], margin + e["y"], e["type"])
   end
   
   Color(1,1,1)
@@ -182,8 +198,10 @@ void CheckForEdge()
   end
 
   if teleported
+    enemies = []
     ClearText()
     GenerateLevel()
+    SetLevel(px, py, " ")
     Draw()
   end
 end
@@ -220,7 +238,12 @@ end
 void PlaceEnemy()
   var x = Int(Random() * w)
   var y = Int(Random() * h)
-  SetLevel(x, y, "X")
+  array enemy = []
+  enemy["x"] = x
+  enemy["y"] = y
+  enemy["type"] = "X"
+  Append(enemies, enemy)
+  SetLevel(x, y, " ")
 end
 
 
