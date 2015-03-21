@@ -1,0 +1,111 @@
+
+var margin = 5
+var w = 20
+var h = 10
+
+var px = Int(w / 2)
+var py = Int(h / 2)
+var levelRoughness = 3
+
+array level
+
+ClearText()
+DisplayGraphics()
+
+Print(" R O G U E L I K E ")
+Print("")
+Sleep(1)
+
+GenerateLevel()
+Draw()
+
+loop
+  Move()
+end
+
+void Move()
+  bool didMove = false
+  if IsKeyPressed("left")
+    px -= 1
+    didMove = true
+  else if IsKeyPressed("right")
+    px += 1
+    didMove = true
+  else if IsKeyPressed("up")
+    py -= 1
+    didMove = true
+  else if IsKeyPressed("down")
+    py += 1
+    didMove = true
+  end
+
+  if didMove
+    Text(px + margin, py + margin, "+")
+    DisplayGraphics()
+    Draw()
+    CheckForEdge()
+  end
+end
+
+void Draw()
+  Color(1,1,1)
+  loop y from 0 to h - 1
+    loop x from 0 to w - 1
+      var row = level[y]
+      Text(x + margin, y + margin, row[x])
+    end
+  end
+  
+  Color(1,0,0)
+  Text(px + margin, py + margin, "@")
+
+  DisplayGraphics()
+end
+
+void CheckForEdge()
+  bool teleported = false
+
+  if px < 0
+    px = w - 1
+    teleported = true
+  else if px > w - 1
+    px = 0
+    teleported = true
+  end
+
+  if py < 0
+    py = h - 1
+    teleported = true
+  else if py > h - 1
+    py = 0
+    teleported = true
+  end
+
+  if teleported
+    ClearText()
+    GenerateLevel()
+    Draw()
+  end
+end
+
+void GenerateLevel()
+  loop y from 0 to h - 1
+    level[y] = []
+    loop x from 0 to w - 1
+      var row = level[y]
+      row[x] = RandomTerrain(levelRoughness)
+    end
+  end
+end
+
+string RandomTerrain(number roughness)
+   var r = Int(Random() * roughness)
+   if r == 0
+     return "."
+   else if r < 4
+     return " "
+   else
+     return "#"
+   end
+end
+
