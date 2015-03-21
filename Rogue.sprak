@@ -24,30 +24,82 @@ end
 Print("GAME OVER")
 
 void Move()
+  number newX = px
+  number newY = py
+
   bool didMove = false
   if IsKeyPressed("left") and CanWalk(-1, 0)
-    px -= 1
+    newX = px - 1
     didMove = true
   else if IsKeyPressed("right") and CanWalk(1, 0)
-    px += 1
+    newX = px + 1
     didMove = true
   else if IsKeyPressed("up") and CanWalk(0, -1)
-    py -= 1
+    newY = py - 1
     didMove = true
   else if IsKeyPressed("down") and CanWalk(0, 1)
-    py += 1
+    newY = py + 1
     didMove = true
   end
 
   if didMove
-    Text(px + margin, py + margin, "+")
-    DisplayGraphics()
+    Text(newX + margin, newY + margin, "+")
+    DisplayGraphics() # make the sword appear immediately
+    bool lost = MaybeFight(newX, newY)
+    if lost
+      # do nothing
+    else
+      px = newX
+      py = newY
+    end
     Draw()
     CheckForEdge()
   end
 end
 
+# Returns true if you lost the battle
+bool MaybeFight(number x, number y)
+  if x < 0
+    return false
+  else if x > w - 1
+    return false
+  else if y < 0
+    return false
+  else if y > h - 1
+    return false
+  end
+
+  var row = level[y]
+  var tile = row[x]
+  if tile == "X"
+    return Fight(x, y)
+  end
+  return false
+end
+
+bool Fight(number x, number y)  
+  Color(1,0,0)
+  Text(0, 0, "Attack!")
+  DisplayGraphics()
+  Sleep(0.5)
+  if Random() > 0.3
+    SetLevel(x, y, " ")
+    Color(0,1,0)
+    Text(0,1,"You won")
+    DisplayGraphics()
+    return false
+  else
+    Text(0,1"You lost")
+    DisplayGraphics()
+    return true
+  end
+end
+
 void Draw()
+  Text(0,0, "                    ")
+  Text(0,1, "                    ")
+  Text(0,2, "                    ")
+
   Color(1,1,1)
   loop y from 0 to h - 1
     loop x from 0 to w - 1
@@ -85,7 +137,13 @@ bool CanWalk(number dx, number dy)
   end
 
   var row = level[y]
-  return row[x] != "#"
+  var tile = row[x]
+
+  if tile == "#"
+    return false
+  end
+
+  return true
 end
 
 void CheckForEdge()
