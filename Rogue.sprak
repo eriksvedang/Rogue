@@ -5,16 +5,14 @@ var h = 10
 
 var px = Int(w / 2)
 var py = Int(h / 2)
-var levelRoughness = 3
+var levelRoughness = 5
 
 array level
 
 ClearText()
 DisplayGraphics()
 
-Print(" R O G U E L I K E ")
-Print("")
-Sleep(1)
+#Print(" R O G U E L I K E ")
 
 GenerateLevel()
 Draw()
@@ -23,18 +21,20 @@ loop
   Move()
 end
 
+Print("GAME OVER")
+
 void Move()
   bool didMove = false
-  if IsKeyPressed("left")
+  if IsKeyPressed("left") and CanWalk(-1, 0)
     px -= 1
     didMove = true
-  else if IsKeyPressed("right")
+  else if IsKeyPressed("right") and CanWalk(1, 0)
     px += 1
     didMove = true
-  else if IsKeyPressed("up")
+  else if IsKeyPressed("up") and CanWalk(0, -1)
     py -= 1
     didMove = true
-  else if IsKeyPressed("down")
+  else if IsKeyPressed("down") and CanWalk(0, 1)
     py += 1
     didMove = true
   end
@@ -52,14 +52,40 @@ void Draw()
   loop y from 0 to h - 1
     loop x from 0 to w - 1
       var row = level[y]
+      var tile = row[x]
+      if tile == "."
+        Color(0,1,0.2)
+      else if tile == "X"
+        Color(1,1,0)
+      else if tile == "#"
+        Color(0.3,0.3,0.3)
+      end
       Text(x + margin, y + margin, row[x])
     end
   end
   
-  Color(1,0,0)
+  Color(1,1,1)
   Text(px + margin, py + margin, "@")
 
   DisplayGraphics()
+end
+
+bool CanWalk(number dx, number dy)
+  number x = px + dx
+  number y = py + dy
+  
+  if x < 0
+    return true
+  else if x > w - 1
+    return true
+  else if y < 0
+    return true
+  else if y > h - 1
+    return true
+  end
+
+  var row = level[y]
+  return row[x] != "#"
 end
 
 void CheckForEdge()
@@ -92,10 +118,18 @@ void GenerateLevel()
   loop y from 0 to h - 1
     level[y] = []
     loop x from 0 to w - 1
-      var row = level[y]
-      row[x] = RandomTerrain(levelRoughness)
+      SetLevel(x, y, RandomTerrain(levelRoughness))
     end
   end
+
+  loop from 1 to 4
+    PlaceEnemy()
+  end
+end
+
+void SetLevel(number x, number y, string s)
+  var row = level[y]
+  row[x] = s
 end
 
 string RandomTerrain(number roughness)
@@ -108,4 +142,12 @@ string RandomTerrain(number roughness)
      return "#"
    end
 end
+
+void PlaceEnemy()
+  var x = Int(Random() * w)
+  var y = Int(Random() * h)
+  SetLevel(x, y, "X")
+end
+
+
 
