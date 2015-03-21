@@ -1,10 +1,12 @@
 
-var margin = 5
+var margin = 3
 var w = 20
 var h = 10
 
 var px = Int(w / 2)
 var py = Int(h / 2)
+var hp = 10
+
 var levelRoughness = 5
 
 array level
@@ -52,9 +54,14 @@ void Move()
       px = newX
       py = newY
     end
+    AI()
     Draw()
     CheckForEdge()
   end
+end
+
+void AI()
+  
 end
 
 # Returns true if you lost the battle
@@ -72,25 +79,31 @@ bool MaybeFight(number x, number y)
   var row = level[y]
   var tile = row[x]
   if tile == "X"
-    return Fight(x, y)
+    return Fight(x, y, 1)
   end
   return false
 end
 
-bool Fight(number x, number y)  
-  Color(1,0,0)
-  Text(0, 0, "Attack!")
-  DisplayGraphics()
-  Sleep(0.5)
+bool Fight(number x, number y, number enemyLevel)  
+  loop a from 1 to 10
+    Color(a / 10.0,1 - a / 10.0,0)
+    Text(1, 0, "Attack!")
+    DisplayGraphics()
+    Sleep(0.1)
+  end
+
   if Random() > 0.3
     SetLevel(x, y, " ")
     Color(0,1,0)
-    Text(0,1,"You won")
+    Text(1, 1,"Enemy defeated!")
     DisplayGraphics()
+    Sleep(1)
     return false
   else
-    Text(0,1"You lost")
+    Color(0,0,1)
+    Text(1, 1, "You missed")
     DisplayGraphics()
+    Sleep(1)
     return true
   end
 end
@@ -118,6 +131,9 @@ void Draw()
   
   Color(1,1,1)
   Text(px + margin, py + margin, "@")
+
+  Color(1,1,1)
+  Text(margin, margin + h + 2, "HP: " + hp)
 
   DisplayGraphics()
 end
