@@ -88,10 +88,20 @@ void UpdateEnemy(array e)
     dx = -1
   else if px > x
     dx = 1
-  else if py < y
+  end
+  
+  if py < y
     dy = -1
   else if py > y
     dy = 1
+  end
+
+  if dx != 0 && dy != 0
+    if Random() < 0.5
+      dx = 0
+    else
+      dy = 0
+    end
   end
 
   number newX = x + dx
@@ -113,8 +123,6 @@ void UpdateEnemy(array e)
   end
 
   Draw()
-
-  Sleep(0.1)
 end
 
 # Returns true if you lost the battle
